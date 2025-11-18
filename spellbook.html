@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Magical Spell Generator</title>
+  <style>
+    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; padding: 2rem; background: #e3c5e3; }
+    h1 { margin: 0 0 1rem 0; }
+    #spellArea { min-height: 4rem; border: 2px dashed #fab1ea; padding: 1rem; margin: 1rem 0; display:flex; align-items:center; justify-content:center; font-size:1.15rem; transition: background-color 400ms ease; background: #ef9696; color: #111; }
+    button { margin-right: 0.5rem; padding:0.5rem 0.8rem; font-size:1rem; cursor: pointer; }
+    #ingredientsList { list-style: none; padding-left: 0; margin-top: 1rem; }
+    #ingredientsList li { background:#f3c7fd; margin:0.25rem 0; padding:0.5rem; border-radius:4px; border:1px solid #eee; }
+    .controls { margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Welcome to the Magical Spell Generator!</h1>
+
+  <div id="spellArea">Your spell will appear here.</div>
+
+  <div class="controls">
+    <button id="generateButton">Generate Spell</button>
+    <button id="resetButton">Reset</button>
+  </div>
+
+  <ul id="ingredientsList">
+    <li>Dragon Scale</li>
+    <li>Phoenix Feather</li>
+    <li>Unicorn Horn</li>
+  </ul>
+
+  <script>
+  (function () {
+    const generateButton = document.getElementById('generateButton');
+    const resetButton = document.getElementById('resetButton');
+    const spellArea = document.getElementById('spellArea');
+    const ingredientNodes = Array.from(document.querySelectorAll('#ingredientsList li'));
+    const ingredients = ingredientNodes.map(n => n.textContent.trim());
+
+    let countdownTimer = null;
+
+    function randomColor() {
+      // return a pleasant random color
+      const r = Math.floor(Math.random() * 200) + 30; // avoid too-dark/too-light
+      const g = Math.floor(Math.random() * 200) + 30;
+      const b = Math.floor(Math.random() * 200) + 30;
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    function pickRandomIngredient() {
+      const idx = Math.floor(Math.random() * ingredients.length);
+      return ingredients[idx];
+    }
+
+    function showCountdownThenSpell() {
+      // Prevent re-triggering while counting
+      generateButton.disabled = true;
+      resetButton.disabled = true;
+
+      let count = 3;
+      spellArea.textContent = count;
+
+      countdownTimer = setInterval(() => {
+        count -= 1;
+        if (count > 0) {
+          spellArea.textContent = count;
+        } else {
+          clearInterval(countdownTimer);
+          countdownTimer = null;
+          const ingredient = pickRandomIngredient();
+          spellArea.textContent = `Your spell uses: ${ingredient}! ✨`;
+          spellArea.style.backgroundColor = randomColor();
+          generateButton.disabled = false;
+          resetButton.disabled = false;
+        }
+      }, 1000);
+    }
+
+    function resetSpellArea() {
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
+      spellArea.textContent = 'Your spell will appear here.';
+      spellArea.style.backgroundColor = '';
+      generateButton.disabled = false;
+    }
+
+    generateButton.addEventListener('click', showCountdownThenSpell);
+    resetButton.addEventListener('click', resetSpellArea);
+  })();
+  </script>
+</body>
+</html>
